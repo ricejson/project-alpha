@@ -33,5 +33,9 @@ func createAdditionalIndexes(db *gorm.DB) error {
 		return fmt.Errorf("create tickets created_at index: %w", err)
 	}
 
+	if err := db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_tags_lower_name ON tags (lower(name)) WHERE deleted_at IS NULL").Error; err != nil {
+		return fmt.Errorf("create tags lower name unique index: %w", err)
+	}
+
 	return nil
 }

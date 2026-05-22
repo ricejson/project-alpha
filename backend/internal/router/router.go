@@ -9,7 +9,10 @@ import (
 	"gorm.io/gorm"
 
 	"project-alpha/backend/internal/config"
+	"project-alpha/backend/internal/handlers"
+	"project-alpha/backend/internal/repositories"
 	"project-alpha/backend/internal/response"
+	"project-alpha/backend/internal/services"
 )
 
 func New(cfg config.Config, db *gorm.DB) *gin.Engine {
@@ -38,9 +41,13 @@ func New(cfg config.Config, db *gorm.DB) *gin.Engine {
 }
 
 func registerAPIRoutes(api *gin.RouterGroup, db *gorm.DB) {
-	_ = db
+	tagRepository := repositories.NewTagRepository(db)
+	tagService := services.NewTagService(tagRepository)
+	tagHandler := handlers.NewTagHandler(tagService)
 
 	api.GET("", func(c *gin.Context) {
 		response.OK(c, gin.H{"status": "ok"})
 	})
+
+	tagHandler.RegisterRoutes(api)
 }
