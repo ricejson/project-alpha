@@ -19,6 +19,10 @@ func main() {
 		log.Fatalf("connect database: %v", err)
 	}
 
+	if err := database.AutoMigrate(db); err != nil {
+		log.Fatalf("migrate database: %v", err)
+	}
+
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatalf("get database handle: %v", err)
