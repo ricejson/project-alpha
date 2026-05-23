@@ -13,6 +13,15 @@ type TagRepository struct {
 	db *gorm.DB
 }
 
+type TagStore interface {
+	Create(tag *models.Tag) error
+	List() ([]models.Tag, error)
+	FindByID(id uint) (models.Tag, error)
+	ExistsByName(name string, excludeID *uint) (bool, error)
+	Save(tag *models.Tag) error
+	Delete(tag *models.Tag) error
+}
+
 func NewTagRepository(db *gorm.DB) *TagRepository {
 	return &TagRepository{db: db}
 }

@@ -14,10 +14,10 @@ import (
 )
 
 type TicketService struct {
-	tickets *repositories.TicketRepository
+	tickets repositories.TicketStore
 }
 
-func NewTicketService(tickets *repositories.TicketRepository) *TicketService {
+func NewTicketService(tickets repositories.TicketStore) *TicketService {
 	return &TicketService{tickets: tickets}
 }
 
@@ -30,7 +30,7 @@ func (s *TicketService) Create(req dto.CreateTicketRequest) (models.Ticket, erro
 	}
 
 	var created models.Ticket
-	if err := s.tickets.Transaction(func(repo *repositories.TicketRepository) error {
+	if err := s.tickets.Transaction(func(repo repositories.TicketStore) error {
 		tags, err := s.findAllTags(repo, req.TagIDs)
 		if err != nil {
 			return err
@@ -64,14 +64,17 @@ func (s *TicketService) Create(req dto.CreateTicketRequest) (models.Ticket, erro
 }
 
 func (s *TicketService) List(query dto.ListTicketsQuery) ([]models.Ticket, dto.PaginationResponse, error) {
-	query = validation.NormalizeListTicketsQuery(query)
+	filter, err := validation.ParseListTicketsFilter(query)
+	if err != nil {
+		return nil, dto.PaginationResponse{}, err
+	}
 
-	tickets, total, err := s.tickets.List(query.Page, query.PageSize)
+	tickets, total, err := s.tickets.List(filter)
 	if err != nil {
 		return nil, dto.PaginationResponse{}, apperror.Wrap(apperror.ErrDatabase, "failed to list tickets", err)
 	}
 
-	return tickets, dto.NewPaginationResponse(query.Page, query.PageSize, total), nil
+	return tickets, dto.NewPaginationResponse(filter.Page, filter.PageSize, total), nil
 }
 
 func (s *TicketService) Get(id uint) (models.Ticket, error) {
@@ -94,7 +97,7 @@ func (s *TicketService) Update(id uint, req dto.UpdateTicketRequest) (models.Tic
 	}
 
 	var updated models.Ticket
-	if err := s.tickets.Transaction(func(repo *repositories.TicketRepository) error {
+	if err := s.tickets.Transaction(func(repo repositories.TicketStore) error {
 		ticket, err := repo.FindByID(id)
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -132,7 +135,7 @@ func (s *TicketService) Update(id uint, req dto.UpdateTicketRequest) (models.Tic
 }
 
 func (s *TicketService) Delete(id uint) error {
-	return s.tickets.Transaction(func(repo *repositories.TicketRepository) error {
+	return s.tickets.Transaction(func(repo repositories.TicketStore) error {
 		ticket, err := repo.FindByID(id)
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -159,7 +162,7 @@ func (s *TicketService) Uncomplete(id uint) (models.Ticket, error) {
 
 func (s *TicketService) AddTag(ticketID uint, tagID uint) (models.Ticket, error) {
 	var updated models.Ticket
-	if err := s.tickets.Transaction(func(repo *repositories.TicketRepository) error {
+	if err := s.tickets.Transaction(func(repo repositories.TicketStore) error {
 		ticket, tag, err := s.findTicketAndTag(repo, ticketID, tagID)
 		if err != nil {
 			return err
@@ -184,7 +187,7 @@ func (s *TicketService) AddTag(ticketID uint, tagID uint) (models.Ticket, error)
 
 func (s *TicketService) RemoveTag(ticketID uint, tagID uint) (models.Ticket, error) {
 	var updated models.Ticket
-	if err := s.tickets.Transaction(func(repo *repositories.TicketRepository) error {
+	if err := s.tickets.Transaction(func(repo repositories.TicketStore) error {
 		ticket, tag, err := s.findTicketAndTag(repo, ticketID, tagID)
 		if err != nil {
 			return err
@@ -209,7 +212,7 @@ func (s *TicketService) RemoveTag(ticketID uint, tagID uint) (models.Ticket, err
 
 func (s *TicketService) setCompletion(id uint, completed bool) (models.Ticket, error) {
 	var updated models.Ticket
-	if err := s.tickets.Transaction(func(repo *repositories.TicketRepository) error {
+	if err := s.tickets.Transaction(func(repo repositories.TicketStore) error {
 		ticket, err := repo.FindByID(id)
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -243,7 +246,7 @@ func (s *TicketService) setCompletion(id uint, completed bool) (models.Ticket, e
 	return updated, nil
 }
 
-func (s *TicketService) findAllTags(repo *repositories.TicketRepository, tagIDs []uint) ([]models.Tag, error) {
+func (s *TicketService) findAllTags(repo repositories.TicketStore, tagIDs []uint) ([]models.Tag, error) {
 	tags, err := repo.FindTagsByIDs(tagIDs)
 	if err != nil {
 		return nil, apperror.Wrap(apperror.ErrDatabase, "failed to find tags", err)
@@ -256,7 +259,7 @@ func (s *TicketService) findAllTags(repo *repositories.TicketRepository, tagIDs 
 	return tags, nil
 }
 
-func (s *TicketService) findTicketAndTag(repo *repositories.TicketRepository, ticketID uint, tagID uint) (models.Ticket, models.Tag, error) {
+func (s *TicketService) findTicketAndTag(repo repositories.TicketStore, ticketID uint, tagID uint) (models.Ticket, models.Tag, error) {
 	ticket, err := repo.FindByID(ticketID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

@@ -19,8 +19,19 @@ type UpdateTicketRequest struct {
 }
 
 type ListTicketsQuery struct {
-	Page     int `form:"page"`
-	PageSize int `form:"pageSize"`
+	Title     string `form:"title"`
+	TagIDsRaw string `form:"tagIds"`
+	Completed *bool  `form:"completed"`
+	Page      int    `form:"page"`
+	PageSize  int    `form:"pageSize"`
+}
+
+type ListTicketsFilter struct {
+	Title     string
+	TagIDs    []uint
+	Completed *bool
+	Page      int
+	PageSize  int
 }
 
 type PaginationResponse struct {

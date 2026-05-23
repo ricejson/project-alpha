@@ -13,10 +13,10 @@ import (
 )
 
 type TagService struct {
-	tags *repositories.TagRepository
+	tags repositories.TagStore
 }
 
-func NewTagService(tags *repositories.TagRepository) *TagService {
+func NewTagService(tags repositories.TagStore) *TagService {
 	return &TagService{tags: tags}
 }
 

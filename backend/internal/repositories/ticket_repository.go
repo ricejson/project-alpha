@@ -6,6 +6,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"project-alpha/backend/internal/dto"
 	"project-alpha/backend/internal/models"
 )
 
@@ -13,11 +14,25 @@ type TicketRepository struct {
 	db *gorm.DB
 }
 
+type TicketStore interface {
+	Transaction(fn func(repo TicketStore) error) error
+	Create(ticket *models.Ticket) error
+	List(filter dto.ListTicketsFilter) ([]models.Ticket, int64, error)
+	FindByID(id uint) (models.Ticket, error)
+	Save(ticket *models.Ticket) error
+	Delete(ticket *models.Ticket) error
+	ReplaceTags(ticket *models.Ticket, tags []models.Tag) error
+	AddTag(ticket *models.Ticket, tag models.Tag) error
+	RemoveTag(ticket *models.Ticket, tag models.Tag) error
+	FindTagsByIDs(tagIDs []uint) ([]models.Tag, error)
+	FindTagByID(id uint) (models.Tag, error)
+}
+
 func NewTicketRepository(db *gorm.DB) *TicketRepository {
 	return &TicketRepository{db: db}
 }
 
-func (r *TicketRepository) Transaction(fn func(repo *TicketRepository) error) error {
+func (r *TicketRepository) Transaction(fn func(repo TicketStore) error) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		return fn(NewTicketRepository(tx))
 	})
@@ -30,23 +45,49 @@ func (r *TicketRepository) Create(ticket *models.Ticket) error {
 	return nil
 }
 
-func (r *TicketRepository) List(page int, pageSize int) ([]models.Ticket, int64, error) {
+func (r *TicketRepository) List(filter dto.ListTicketsFilter) ([]models.Ticket, int64, error) {
+	baseQuery := r.applyListFilters(r.db.Model(&models.Ticket{}), filter)
+
 	var total int64
-	if err := r.db.Model(&models.Ticket{}).Count(&total).Error; err != nil {
+	countQuery := baseQuery.Session(&gorm.Session{})
+	if len(filter.TagIDs) > 0 {
+		countQuery = countQuery.Select("tickets.id")
+	}
+	if err := r.db.Table("(?) AS filtered_tickets", countQuery).Count(&total).Error; err != nil {
 		return nil, 0, fmt.Errorf("count tickets: %w", err)
 	}
 
 	var tickets []models.Ticket
-	offset := (page - 1) * pageSize
-	if err := r.db.Preload("Tags").
-		Order("created_at DESC").
-		Limit(pageSize).
+	offset := (filter.Page - 1) * filter.PageSize
+	if err := baseQuery.Preload("Tags").
+		Order("tickets.created_at DESC").
+		Limit(filter.PageSize).
 		Offset(offset).
 		Find(&tickets).Error; err != nil {
 		return nil, 0, fmt.Errorf("list tickets: %w", err)
 	}
 
 	return tickets, total, nil
+}
+
+func (r *TicketRepository) applyListFilters(query *gorm.DB, filter dto.ListTicketsFilter) *gorm.DB {
+	if filter.Title != "" {
+		query = query.Where("tickets.title ILIKE ?", "%"+filter.Title+"%")
+	}
+
+	if filter.Completed != nil {
+		query = query.Where("tickets.completed = ?", *filter.Completed)
+	}
+
+	if len(filter.TagIDs) > 0 {
+		query = query.
+			Joins("JOIN ticket_tags ON ticket_tags.ticket_id = tickets.id").
+			Where("ticket_tags.tag_id IN ?", filter.TagIDs).
+			Group("tickets.id").
+			Having("COUNT(DISTINCT ticket_tags.tag_id) = ?", len(filter.TagIDs))
+	}
+
+	return query
 }
 
 func (r *TicketRepository) FindByID(id uint) (models.Ticket, error) {
