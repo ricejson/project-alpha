@@ -21,12 +21,12 @@ export function Toasts({ messages, onDismiss }: ToastsProps) {
           key={toast.id}
           role="status"
           className={cn(
-            "flex items-start justify-between gap-3 rounded-md border bg-background p-3 text-sm shadow-lg",
-            toast.type === "error" ? "border-destructive/40" : "border-emerald-300",
+            "flex items-start justify-between gap-3 rounded-[24px] border bg-white/92 p-3 text-sm shadow-[0_16px_36px_rgba(15,23,42,0.16)] backdrop-blur-xl",
+            toast.type === "error" ? "border-destructive/20" : "border-emerald-200",
           )}
         >
           <span>{toast.message}</span>
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onDismiss(toast.id)}>
+          <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={() => onDismiss(toast.id)}>
             <X className="h-3.5 w-3.5" />
           </Button>
         </div>

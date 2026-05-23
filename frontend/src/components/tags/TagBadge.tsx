@@ -18,7 +18,7 @@ export function TagBadge({ tag, removable, onRemove }: TagBadgeProps) {
           aria-label={`移除标签 ${tag.name}`}
           variant="ghost"
           size="icon"
-          className="h-4 w-4 rounded-sm p-0 hover:bg-transparent"
+          className="h-4 w-4 rounded-full p-0 hover:bg-transparent"
           onClick={() => onRemove?.(tag.id)}
         >
           <X className="h-3 w-3" />

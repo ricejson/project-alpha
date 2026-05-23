@@ -24,12 +24,12 @@ export function TicketList({
 }: TicketListProps) {
   if (loading) {
     return (
-      <div className="divide-y">
-        {Array.from({ length: 5 }, (_, index) => (
-          <div key={index} className="space-y-3 px-4 py-4 lg:px-6">
-            <Skeleton className="h-5 w-2/3" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-6 w-48" />
+      <div className="space-y-4">
+        {Array.from({ length: 4 }, (_, index) => (
+          <div key={index} className="rounded-2xl border border-border/60 bg-white p-5 shadow-sm">
+            <Skeleton className="h-5 w-2/3 rounded-full" />
+            <Skeleton className="mt-5 h-4 w-1/2 rounded-full" />
+            <Skeleton className="mt-4 h-6 w-64 rounded-full" />
           </div>
         ))}
       </div>
@@ -38,7 +38,7 @@ export function TicketList({
 
   if (error) {
     return (
-      <div className="m-4 flex items-start gap-3 rounded-md border border-destructive/30 p-4 text-sm text-destructive lg:m-6">
+      <div className="flex items-start gap-3 rounded-2xl border border-destructive/20 bg-white p-4 text-sm text-destructive shadow-sm">
         <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
         <span>{error}</span>
       </div>
@@ -46,11 +46,16 @@ export function TicketList({
   }
 
   if (!tickets.length) {
-    return <div className="m-4 rounded-md border p-10 text-center text-sm text-muted-foreground lg:m-6">暂无 Ticket</div>
+    return (
+      <div className="rounded-2xl border border-dashed border-border/80 bg-white px-6 py-14 text-center">
+        <div className="text-lg font-semibold tracking-tight text-foreground">暂无 Ticket</div>
+        <p className="mt-2 text-sm text-muted-foreground">创建一个新 ticket，或者调整搜索和筛选条件。</p>
+      </div>
+    )
   }
 
   return (
-    <div className="divide-y">
+    <div className="space-y-4">
       {tickets.map((ticket) => (
         <TicketListItem
           key={ticket.id}

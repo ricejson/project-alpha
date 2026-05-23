@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import type { FormEvent } from "react"
-import { Edit2, Plus, Trash2, X } from "lucide-react"
+import { Check, Edit2, Plus, Sparkles, Trash2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { Dialog } from "@/components/ui/dialog"
@@ -122,10 +122,19 @@ export function TagManagerDialog({
 
   return (
     <>
-      <Dialog open={open} title="标签管理" onClose={onClose} className="max-w-2xl">
-        <form className="grid gap-3 border-b pb-4" onSubmit={submitForm}>
+      <Dialog
+        open={open}
+        title="标签管理"
+        description="用颜色和名称建立稳定的工作分类，避免分类噪音。"
+        onClose={onClose}
+        className="max-w-2xl"
+      >
+        <form className="grid gap-4 border-b border-border/70 pb-5" onSubmit={submitForm}>
           <div className="flex items-center justify-between gap-3">
-            <h3 className="text-sm font-semibold">{title}</h3>
+            <h3 className="flex items-center gap-2 text-sm font-semibold">
+              <Sparkles className="h-4 w-4 text-muted-foreground" />
+              {title}
+            </h3>
             {editingTag ? (
               <Button type="button" variant="ghost" size="sm" onClick={resetForm}>
                 <X className="h-4 w-4" />
@@ -133,13 +142,14 @@ export function TagManagerDialog({
               </Button>
             ) : null}
           </div>
-          <div className="grid gap-3 sm:grid-cols-[1fr_8rem_auto]">
+          <div className="grid gap-3 sm:grid-cols-[1fr_12rem_auto]">
             <Input
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder="标签名称"
               aria-label="标签名称"
               maxLength={40}
+              className="rounded-full bg-background/80"
             />
             <div className="flex gap-2">
               <Input
@@ -147,18 +157,18 @@ export function TagManagerDialog({
                 onChange={(event) => setColor(event.target.value)}
                 placeholder="#2563eb"
                 aria-label="标签颜色"
-                className="font-mono"
+                className="font-mono rounded-full bg-background/80"
               />
               <input
                 aria-label="选择标签颜色"
                 type="color"
                 value={COLOR_PATTERN.test(color) ? color : DEFAULT_COLOR}
                 onChange={(event) => setColor(event.target.value)}
-                className="h-9 w-10 rounded-md border border-input bg-background"
+                className="h-9 w-10 rounded-full border border-border/80 bg-background"
               />
             </div>
             <Button type="submit" disabled={busy}>
-              <Plus className="h-4 w-4" />
+              {editingTag ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
               {editingTag ? "保存" : "创建"}
             </Button>
           </div>
@@ -167,12 +177,12 @@ export function TagManagerDialog({
 
         <div className="mt-4 space-y-2">
           {loading ? (
-            Array.from({ length: 4 }, (_, index) => <Skeleton key={index} className="h-11" />)
+            Array.from({ length: 4 }, (_, index) => <Skeleton key={index} className="h-12 rounded-[20px]" />)
           ) : error ? (
-            <div className="rounded-md border border-destructive/30 p-3 text-sm text-destructive">{error}</div>
+            <div className="rounded-[20px] border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">{error}</div>
           ) : sortedTags.length ? (
             sortedTags.map((tag) => (
-              <div key={tag.id} className="flex items-center justify-between gap-3 rounded-md border p-3">
+              <div key={tag.id} className="flex items-center justify-between gap-3 rounded-[20px] border border-border/70 bg-white/80 p-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <span
                     className="h-4 w-4 shrink-0 rounded-full border"
@@ -184,7 +194,13 @@ export function TagManagerDialog({
                   </div>
                 </div>
                 <div className="flex shrink-0 gap-1">
-                  <Button aria-label={`编辑标签 ${tag.name}`} variant="ghost" size="icon" onClick={() => startEdit(tag)}>
+                  <Button
+                    aria-label={`编辑标签 ${tag.name}`}
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => startEdit(tag)}
+                    className="rounded-full border border-border/70 bg-white/90 shadow-sm shadow-black/5"
+                  >
                     <Edit2 className="h-4 w-4" />
                   </Button>
                   <Button
@@ -192,6 +208,7 @@ export function TagManagerDialog({
                     variant="ghost"
                     size="icon"
                     onClick={() => setDeleteTarget(tag)}
+                    className="rounded-full border border-border/70 bg-white/90 shadow-sm shadow-black/5"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -199,7 +216,9 @@ export function TagManagerDialog({
               </div>
             ))
           ) : (
-            <div className="rounded-md border p-6 text-center text-sm text-muted-foreground">暂无标签</div>
+            <div className="rounded-[20px] border border-dashed border-border/70 p-6 text-center text-sm text-muted-foreground">
+              暂无标签
+            </div>
           )}
         </div>
       </Dialog>

@@ -4,27 +4,31 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
+    --background: 220 33% 98%;
+    --foreground: 220 27% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 47.4% 11.2%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 72.22% 50.59%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --card-foreground: 220 27% 11%;
+    --primary: 217 91% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 100% 97%;
+    --secondary-foreground: 220 27% 11%;
+    --muted: 220 16% 96%;
+    --muted-foreground: 220 10% 42%;
+    --accent: 220 14% 94%;
+    --accent-foreground: 220 27% 11%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 14% 88%;
+    --input: 220 14% 88%;
+    --ring: 217 91% 55%;
   }
 
   * {
     @apply border-border;
+  }
+
+  html {
+    background: #f6f8fc;
   }
 
   body {
@@ -33,6 +37,7 @@
       Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
       "Segoe UI", sans-serif;
     letter-spacing: 0;
+    min-height: 100vh;
   }
 
   button,
@@ -46,5 +51,18 @@
 @layer components {
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+
+  .app-shell {
+    @apply mx-auto flex min-h-screen w-full max-w-[1600px] flex-col;
+  }
+
+  .app-band {
+    border-bottom: 1px solid hsl(var(--border) / 0.55);
+    background-color: rgba(255, 255, 255, 0.92);
+  }
+
+  .app-surface {
+    background-color: rgba(255, 255, 255, 0.96);
   }
 }

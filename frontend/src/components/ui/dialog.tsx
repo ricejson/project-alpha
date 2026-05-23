@@ -19,19 +19,19 @@ export function Dialog({ open, title, description, children, onClose, className 
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4" role="presentation">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4" role="presentation">
       <section
         aria-modal="true"
         role="dialog"
         aria-labelledby={titleId}
         className={cn(
-          "max-h-[calc(100vh-2rem)] w-full max-w-xl overflow-auto rounded-lg border bg-background p-5 shadow-lg",
+          "max-h-[calc(100vh-2rem)] w-full max-w-xl overflow-auto rounded-2xl border border-border/70 bg-white p-5 shadow-[0_24px_60px_rgba(15,23,42,0.16)]",
           className,
         )}
       >
-        <div className="mb-4 flex items-start justify-between gap-4">
+        <div className="mb-5 flex items-start justify-between gap-4 border-b border-border/60 pb-4">
           <div>
-            <h2 id={titleId} className="text-lg font-semibold">
+            <h2 id={titleId} className="text-[1.1rem] font-semibold tracking-tight">
               {title}
             </h2>
             {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}

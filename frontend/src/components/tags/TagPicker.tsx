@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Check, Tags, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -25,10 +25,32 @@ export function TagPicker({
 }: TagPickerProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
+  const rootRef = useRef<HTMLDivElement>(null)
 
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds])
   const selectedTags = tags.filter((tag) => selectedSet.has(tag.id))
   const filteredTags = tags.filter((tag) => tag.name.toLowerCase().includes(query.trim().toLowerCase()))
+
+  useEffect(() => {
+    function handlePointerDown(event: PointerEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setOpen(false)
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false)
+      }
+    }
+
+    window.addEventListener("pointerdown", handlePointerDown)
+    window.addEventListener("keydown", handleKeyDown)
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown)
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [])
 
   function toggleTag(tagId: number) {
     if (selectedSet.has(tagId)) {
@@ -39,29 +61,29 @@ export function TagPicker({
   }
 
   return (
-    <div className="relative">
+    <div ref={rootRef} className="relative min-w-0">
       <Button
         type="button"
         variant="outline"
-        className="h-9 min-w-40 justify-between"
+        className="h-11 w-full justify-between rounded-full border-border/80 bg-white px-4 shadow-sm shadow-black/5"
         disabled={disabled}
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
         <span className="flex min-w-0 items-center gap-2">
           <Tags className="h-4 w-4 shrink-0" />
-          <span className="truncate">{selectedIds.length ? `${label} ${selectedIds.length}` : label}</span>
+          <span className="truncate">{selectedIds.length ? `${label} · ${selectedIds.length}` : label}</span>
         </span>
       </Button>
 
       {open ? (
-        <div className="absolute left-0 top-11 z-40 w-72 rounded-md border bg-background p-3 shadow-lg">
+        <div className="absolute left-0 top-[3.25rem] z-40 w-80 rounded-[24px] border border-border/70 bg-white p-3 shadow-[0_18px_40px_rgba(15,23,42,0.16)]">
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="搜索标签"
             aria-label="搜索标签"
-            className="mb-2"
+            className="mb-2 rounded-full border-border/80 bg-background/70"
           />
           <div className="max-h-56 overflow-auto">
             {filteredTags.length ? (
@@ -72,8 +94,8 @@ export function TagPicker({
                     key={tag.id}
                     type="button"
                     className={cn(
-                      "flex h-9 w-full items-center justify-between gap-2 rounded-md px-2 text-left text-sm hover:bg-accent",
-                      selected ? "font-medium" : "font-normal",
+                      "flex h-10 w-full items-center justify-between gap-2 rounded-full px-3 text-left text-sm transition-colors duration-200 hover:bg-accent/80",
+                      selected ? "bg-accent/70 font-medium" : "font-normal",
                     )}
                     onClick={() => toggleTag(tag.id)}
                   >
@@ -97,7 +119,7 @@ export function TagPicker({
               type="button"
               variant="ghost"
               size="sm"
-              className="mt-2 w-full"
+              className="mt-2 w-full rounded-full"
               onClick={() => onChange([])}
             >
               <X className="h-4 w-4" />
@@ -108,7 +130,7 @@ export function TagPicker({
       ) : null}
 
       {selectedTags.length ? (
-        <div className="mt-2 flex flex-wrap gap-1.5">
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {selectedTags.map((tag) => (
             <TagBadge
               key={tag.id}

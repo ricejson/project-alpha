@@ -39,13 +39,15 @@ export function App() {
 
   return (
     <>
-      <TicketPage
-        tags={tags.tags}
-        tagsLoading={tags.loading}
-        tagsVersion={tagVersion}
-        onManageTags={() => setTagManagerOpen(true)}
-        notify={notify}
-      />
+      <div className="app-shell">
+        <TicketPage
+          tags={tags.tags}
+          tagsLoading={tags.loading}
+          tagsVersion={tagVersion}
+          onManageTags={() => setTagManagerOpen(true)}
+          notify={notify}
+        />
+      </div>
       <TagManagerDialog
         open={tagManagerOpen}
         tags={tags.tags}

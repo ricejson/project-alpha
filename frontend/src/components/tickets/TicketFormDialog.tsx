@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import type { FormEvent } from "react"
-import { Save } from "lucide-react"
+import { Save, Sparkles } from "lucide-react"
 import { TagPicker } from "@/components/tags/TagPicker"
 import { Button } from "@/components/ui/button"
 import { Dialog } from "@/components/ui/dialog"
@@ -78,10 +78,11 @@ export function TicketFormDialog({
     <Dialog
       open={open}
       title={ticket ? "编辑 Ticket" : "新建 Ticket"}
+      description={ticket ? "调整标题、描述和标签，保持上下文连续。" : "写下一个清晰的 ticket，随后再补充标签。"}
       onClose={onClose}
       className="max-w-2xl"
     >
-      <form className="space-y-4" onSubmit={submit}>
+      <form className="space-y-5" onSubmit={submit}>
         <div className="space-y-2">
           <label className="text-sm font-medium" htmlFor="ticket-title">
             标题
@@ -91,8 +92,9 @@ export function TicketFormDialog({
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             maxLength={120}
-            placeholder="Ticket 标题"
+            placeholder="例如：修复 iOS 列表卡片错位"
             autoFocus
+            className="rounded-full bg-background/80"
           />
         </div>
 
@@ -105,13 +107,17 @@ export function TicketFormDialog({
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             maxLength={5000}
-            placeholder="补充说明"
+            placeholder="补充说明，描述问题、目标或验收标准"
+            className="min-h-36 rounded-[24px] bg-background/80"
           />
           <div className="text-right text-xs text-muted-foreground">{description.length}/5000</div>
         </div>
 
         <div className="space-y-2">
-          <div className="text-sm font-medium">标签</div>
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Sparkles className="h-4 w-4 text-muted-foreground" />
+            标签
+          </div>
           <TagPicker
             tags={tags}
             selectedIds={tagIds}
@@ -123,7 +129,7 @@ export function TicketFormDialog({
 
         {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
 
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 border-t border-border/70 pt-4">
           <Button type="button" variant="outline" onClick={onClose} disabled={busy}>
             取消
           </Button>

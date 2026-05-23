@@ -55,7 +55,7 @@ describe("App", () => {
 
     expect(await screen.findByText("Build API")).toBeInTheDocument()
     expect(screen.getByText("Ship UI")).toBeInTheDocument()
-    expect(screen.getByText("backend")).toBeInTheDocument()
+    expect(screen.getAllByText("backend").length).toBeGreaterThan(0)
   })
 
   it("按标题搜索 ticket", async () => {
@@ -76,7 +76,6 @@ describe("App", () => {
     render(<App />)
 
     await screen.findByText("Build API")
-    await user.click(screen.getByRole("button", { name: /标签筛选/ }))
     await user.click(screen.getByRole("button", { name: /frontend/ }))
 
     await waitFor(() => {
@@ -123,7 +122,7 @@ describe("App", () => {
     render(<App />)
 
     await screen.findByText("Build API")
-    await user.click(screen.getByRole("button", { name: "标签" }))
+    await user.click(screen.getByRole("button", { name: "管理标签" }))
 
     const manager = screen.getByRole("dialog")
     await user.type(within(manager).getByLabelText("标签名称"), "backend")
