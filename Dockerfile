@@ -11,7 +11,7 @@ RUN --mount=type=cache,target=/root/.npm \
     npm ci
 
 # Build the Vite production bundle
-ARG VITE_API_BASE_URL=/api/v1
+ARG VITE_API_BASE_URL=https://project-alpha-bt-224586-8-1326559147.sh.run.tcloudbase.com/api/v1
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 COPY . .
 RUN npm run build
