@@ -1,0 +1,12 @@
+name = "project-alpha-shilianjie"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "./dist"
+
+# Build environment variables are baked into the static bundle at build time
+# via Vite. Set them in the deploy script (scripts/deploy.sh):
+#   VITE_API_BASE_URL = "https://project-alpha-shilianjie.fly.dev/api/v1"
+#
+# After the first deploy, you can also pin them via:
+#   wrangler pages secret put VITE_API_BASE_URL \
+#       --project-name project-alpha-shilianjie \
+#       --env production

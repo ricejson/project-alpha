@@ -10,7 +10,7 @@ DATABASE_URL ?= host=localhost user=project_alpha password=project_alpha dbname=
 CORS_ALLOWED_ORIGINS ?= http://localhost:$(FRONTEND_PORT)
 VITE_API_BASE_URL ?= http://localhost:8080/api/v1
 
-.PHONY: help dev db backend frontend install fmt lint test build precommit clean
+.PHONY: help dev db backend frontend install fmt lint test build precommit clean deploy
 
 help:
 	@echo "project-alpha make targets:"
@@ -25,6 +25,7 @@ help:
 	@echo "  make build     Build frontend"
 	@echo "  make precommit Run all pre-commit hooks"
 	@echo "  make clean     Remove frontend build outputs"
+	@echo "  make deploy    Deploy to Fly.io + Cloudflare Pages (one command)"
 
 dev: db
 	@trap 'kill 0' INT TERM EXIT; \
@@ -71,3 +72,6 @@ precommit:
 clean:
 	rm -rf $(FRONTEND_DIR)/dist
 	rm -f $(FRONTEND_DIR)/*.tsbuildinfo
+
+deploy:
+	./scripts/deploy.sh
