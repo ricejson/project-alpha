@@ -1,0 +1,21 @@
+.git
+.gitignore
+.github
+.idea
+.vscode
+.DS_Store
+
+node_modules
+dist
+.vite
+coverage
+*.tsbuildinfo
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Frontend is built in its own image - no sibling content needed
+Dockerfile
+.dockerignore

@@ -1,0 +1,16 @@
+.git
+.gitignore
+.github
+.idea
+.vscode
+.DS_Store
+
+# Go build artefacts
+bin/
+*.test
+coverage.out
+
+# Local env files
+.env
+.env.*
+!.env.example
